@@ -2,6 +2,8 @@ const { User } = require("../../models");
 // const { Conflict } = require("http-errors");
 const createError = require("http-errors");
 const gravatar = require("gravatar");
+const { v4 } = require("uuid");
+const sendEmail = require("../../services/emailService");
 
 const signup = async (req, res) => {
   const { email, password, subscription = "starter" } = req.body;
@@ -10,6 +12,7 @@ const signup = async (req, res) => {
     //   throw new Conflict("Email in use");
     throw new createError.Conflict("Email in use");
   }
+  const verificationToken = v4();
   const avatarURL = gravatar.url(email);
 
   const newUser = await User.create({
@@ -17,13 +20,24 @@ const signup = async (req, res) => {
     password,
     subscription,
     avatarURL,
+    verificationToken,
   });
+
   newUser.setPassword(password);
-  newUser.save();
+  await newUser.save();
+  const link = `http://localhost:3000/api/users/verify/:${verificationToken},`;
+
+  const confirmEmail = {
+    to: email,
+    subject: "Confirm email",
+    html: `<a target="_blank" href= "${link}">Follow the link ${link}to confirm your email</a>`,
+  };
+
+  await sendEmail(confirmEmail);
 
   res.status(201).json({
     data: {
-      user: { email, subscription, avatarURL },
+      user: { email, subscription, avatarURL, verificationToken },
     },
   });
 };
