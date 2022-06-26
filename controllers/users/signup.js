@@ -30,12 +30,12 @@ const signup = async (req, res) => {
   const confirmEmail = {
     to: email,
     subject: "Confirm email",
-    html: `<p>Follow the link to confirm your email - localhost:3000/api/users/verify/:${verificationToken}</p>`,
+    html: `<p>Follow the link to confirm your email - localhost:3000/api/users/verify/${verificationToken}</p>`,
   };
 
   await sendEmail(confirmEmail);
 
-  res.status(201).json({
+  return res.status(201).json({
     data: {
       user: { email, subscription, avatarURL, verificationToken },
     },
