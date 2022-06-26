@@ -15,7 +15,7 @@ const signup = async (req, res) => {
   const verificationToken = v4();
   const avatarURL = gravatar.url(email);
 
-  const newUser = await User.create({
+  const newUser = await new User({
     email,
     password,
     subscription,
@@ -25,12 +25,12 @@ const signup = async (req, res) => {
 
   newUser.setPassword(password);
   await newUser.save();
-  const link = `http://localhost:3000/api/users/verify/:${verificationToken},`;
+  // const link = `http://localhost:3000/api/users/verify/:${verificationToken},`;
 
   const confirmEmail = {
     to: email,
     subject: "Confirm email",
-    html: `<a target="_blank" href= "${link}">Follow the link ${link}to confirm your email</a>`,
+    html: `<p>Follow the link to confirm your email - localhost:3000/api/users/verify/:${verificationToken}</p>`,
   };
 
   await sendEmail(confirmEmail);
@@ -41,5 +41,4 @@ const signup = async (req, res) => {
     },
   });
 };
-
 module.exports = signup;
