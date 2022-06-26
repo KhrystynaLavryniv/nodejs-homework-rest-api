@@ -8,7 +8,7 @@ const { SECRET_KEY } = process.env;
 const login = async (req, res) => {
   const { email, password, subscription = "starter" } = req.body;
   const user = await User.findOne({ email });
-  if (!user || !user.veryfy || !user.comparePassword(password)) {
+  if (!user || !user.verify || !user.comparePassword(password)) {
     throw new Unauthorized(
       "Email or password is wrong or you not verify your email"
     );
